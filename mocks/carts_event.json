@@ -1,0 +1,14 @@
+{
+    "body": {
+        "items": [
+            "brewed coffee",
+            "vanilla",
+            "java beans"
+        ]
+    },
+    "requestContext": {
+      "identity": {
+        "cognitoIdentityId": "USER-SUB-1234"
+      }
+    }
+  }
