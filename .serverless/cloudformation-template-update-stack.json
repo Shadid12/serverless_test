@@ -62,6 +62,18 @@
         "LogGroupName": "/aws/lambda/shop-api-dev-create-cart"
       }
     },
+    "AllDashcartsLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/shop-api-dev-all-carts"
+      }
+    },
+    "CreateDashproductsLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/shop-api-dev-create-products"
+      }
+    },
     "IamRoleLambdaExecution": {
       "Type": "AWS::IAM::Role",
       "Properties": {
@@ -165,7 +177,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/shop-api/dev/1584331598817-2020-03-16T04:06:38.817Z/create-cart.zip"
+          "S3Key": "serverless/shop-api/dev/1584419947567-2020-03-17T04:39:07.567Z/create-cart.zip"
         },
         "FunctionName": "shop-api-dev-create-cart",
         "Handler": "create-cart.main",
@@ -184,14 +196,86 @@
         "IamRoleLambdaExecution"
       ]
     },
-    "CreateDashcartLambdaVersionxiYXpExQawjH3vzZel3SMhiDZznm9V4RP3dPJoBFuxk": {
+    "CreateDashcartLambdaVersionInsGek0E9cSBQaPOWyXJbKurIp1843Bhz29lFobacc": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "CreateDashcartLambdaFunction"
         },
-        "CodeSha256": "JC4kwDJJuxrkEl0Ofyq8DUH4ndsdKKQtqIp5yYMhtz4="
+        "CodeSha256": "S+l+DSiKdrXkMUcnwj5WdizdQfRQc9FPUMynNu5OQac="
+      }
+    },
+    "AllDashcartsLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/shop-api/dev/1584419947567-2020-03-17T04:39:07.567Z/all-carts.zip"
+        },
+        "FunctionName": "shop-api-dev-all-carts",
+        "Handler": "all-carts.main",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs10.x",
+        "Timeout": 6
+      },
+      "DependsOn": [
+        "AllDashcartsLogGroup",
+        "IamRoleLambdaExecution"
+      ]
+    },
+    "AllDashcartsLambdaVersionG3VqJtxxxkIvl1af2Xse9AwAKZMTitZkf4aRibbs": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "AllDashcartsLambdaFunction"
+        },
+        "CodeSha256": "ExMtH/irQQQnIEXjX3I4z93CDSWqKABPATJNVh6Grt8="
+      }
+    },
+    "CreateDashproductsLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/shop-api/dev/1584419947567-2020-03-17T04:39:07.567Z/create-products.zip"
+        },
+        "FunctionName": "shop-api-dev-create-products",
+        "Handler": "create-products.main",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs10.x",
+        "Timeout": 6
+      },
+      "DependsOn": [
+        "CreateDashproductsLogGroup",
+        "IamRoleLambdaExecution"
+      ]
+    },
+    "CreateDashproductsLambdaVersionlhflpHShojzlvuw83cdRqhb7a7OJfAZHiSyN8eyy4": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "CreateDashproductsLambdaFunction"
+        },
+        "CodeSha256": "U0Jx++Zm7UdqhGAmDJuMPCBnHFJ2XSgOBCsetayxuCU="
       }
     },
     "ApiGatewayRestApi": {
@@ -249,7 +333,7 @@
               "ResponseParameters": {
                 "method.response.header.Access-Control-Allow-Origin": "'*'",
                 "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
-                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST'"
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST,GET'"
               },
               "ResponseTemplates": {
                 "application/json": "#set($origin = $input.params(\"Origin\"))\n#if($origin == \"\") #set($origin = $input.params(\"origin\")) #end\n#if($origin.matches(\".*\")) #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin) #end"
@@ -296,7 +380,7 @@
                 ":lambda:path/2015-03-31/functions/",
                 {
                   "Fn::GetAtt": [
-                    "CreateDashcartLambdaFunction",
+                    "CreateDashproductsLambdaFunction",
                     "Arn"
                   ]
                 },
@@ -308,7 +392,50 @@
         "MethodResponses": []
       }
     },
-    "ApiGatewayDeployment1584331576090": {
+    "ApiGatewayMethodCartsGet": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "HttpMethod": "GET",
+        "RequestParameters": {},
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceCarts"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "ApiKeyRequired": false,
+        "AuthorizationType": "AWS_IAM",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "AllDashcartsLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        },
+        "MethodResponses": []
+      }
+    },
+    "ApiGatewayDeployment1584419850628": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
@@ -318,6 +445,8 @@
       },
       "DependsOn": [
         "ApiGatewayMethodCartsOptions",
+        "ApiGatewayMethodCartsPost",
+        "ApiGatewayMethodCartsGet",
         "ApiGatewayMethodCartsPost"
       ]
     },
@@ -327,6 +456,80 @@
         "FunctionName": {
           "Fn::GetAtt": [
             "CreateDashcartLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "/*/*"
+            ]
+          ]
+        }
+      }
+    },
+    "AllDashcartsLambdaPermissionApiGateway": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "AllDashcartsLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "/*/*"
+            ]
+          ]
+        }
+      }
+    },
+    "CreateDashproductsLambdaPermissionApiGateway": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "CreateDashproductsLambdaFunction",
             "Arn"
           ]
         },
@@ -385,6 +588,33 @@
         "BillingMode": "PAY_PER_REQUEST"
       }
     },
+    "ProductsTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "TableName": "products",
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "productId",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "price",
+            "AttributeType": "N"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "productId",
+            "KeyType": "HASH"
+          },
+          {
+            "AttributeName": "price",
+            "KeyType": "RANGE"
+          }
+        ],
+        "BillingMode": "PAY_PER_REQUEST"
+      }
+    },
     "GatewayResponseDefault4XX": {
       "Type": "AWS::ApiGateway::GatewayResponse",
       "Properties": {
@@ -421,7 +651,19 @@
     "CreateDashcartLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "CreateDashcartLambdaVersionxiYXpExQawjH3vzZel3SMhiDZznm9V4RP3dPJoBFuxk"
+        "Ref": "CreateDashcartLambdaVersionInsGek0E9cSBQaPOWyXJbKurIp1843Bhz29lFobacc"
+      }
+    },
+    "AllDashcartsLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "AllDashcartsLambdaVersionG3VqJtxxxkIvl1af2Xse9AwAKZMTitZkf4aRibbs"
+      }
+    },
+    "CreateDashproductsLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "CreateDashproductsLambdaVersionlhflpHShojzlvuw83cdRqhb7a7OJfAZHiSyN8eyy4"
       }
     },
     "ServiceEndpoint": {

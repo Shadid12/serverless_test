@@ -1,0 +1,11 @@
+{
+    "body": {
+        "name": "Brewed Coffee Arabica",
+        "price": 11
+    },
+    "requestContext": {
+        "identity": {
+          "cognitoIdentityId": "USER-SUB-1234"
+        }
+    }
+}

@@ -26,6 +26,7 @@ provider:
         - dynamodb:DeleteItem
       Resource:
         - "Fn::GetAtt": [ CartsTable, Arn ]
+        - "Fn::GetAtt": [ ProductsTable, Arn ]
 
 functions:
   create-cart:
@@ -36,17 +37,27 @@ functions:
           method: post
           cors: true
           authorizer: aws_iam
-  update-cart:
-    handler: update-cart.main
+  all-carts:
+    handler: all-carts.main
     events:
       - http:
           path: carts
-          method: update
+          method: get
+          cors: true
+          authorizer: aws_iam
+  create-products:
+    handler: create-products.main
+    events:
+      - http:
+          path: carts
+          method: post
           cors: true
           authorizer: aws_iam
 
+
 resources:
   Resources:
+    # CREATE CARTS TABLE
     CartsTable:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -64,6 +75,24 @@ resources:
         # Set the capacity to auto-scale
         BillingMode: PAY_PER_REQUEST
 
+    # CREATE PRODUCTS TABLE
+    ProductsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: products
+        AttributeDefinitions:
+          - AttributeName: productId
+            AttributeType: S
+          - AttributeName: price
+            AttributeType: N
+        KeySchema:
+          - AttributeName: productId
+            KeyType: HASH
+          - AttributeName: price
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+    
+    # API GATEWAY 
     GatewayResponseDefault4XX:
       Type: 'AWS::ApiGateway::GatewayResponse'
       Properties:
